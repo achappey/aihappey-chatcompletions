@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoWarn>OPENAI001;CS1998;NU1608</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+      <PackageReference Include="ModelContextProtocol" Version="2.3.0" />
+      <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.3.0" />		
+
+  </ItemGroup>
+</Project>
