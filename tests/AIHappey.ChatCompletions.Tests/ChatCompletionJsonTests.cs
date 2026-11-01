@@ -262,4 +262,60 @@ public class ChatCompletionJsonTests
             """{"model":"gpt-4o-mini","messages":[],"tool_choice":"required"}""")!;
         Assert.Equal("required", deserialized.ToolChoice);
     }
+
+    [Fact]
+    public void Unset_optional_fields_are_omitted_without_changing_explicit_values()
+    {
+        var defaults = JsonSerializer.SerializeToElement(new ChatCompletionOptions
+        {
+            Model = "gpt-4o-mini",
+            Messages = []
+        });
+
+        foreach (var field in new[]
+                 {
+                     "temperature", "parallel_tool_calls", "stream", "reasoning_effort", "tool_choice"
+                 })
+        {
+            Assert.False(defaults.TryGetProperty(field, out _), $"Unexpected unset field '{field}'.");
+        }
+
+        var configured = JsonSerializer.SerializeToElement(new ChatCompletionOptions
+        {
+            Model = "gpt-4o-mini",
+            Messages = [],
+            Temperature = 0,
+            ParallelToolCalls = false,
+            Stream = false,
+            ReasoningEffort = ChatCompletionReasoningEffort.Medium,
+            ToolChoiceOption = "none"
+        });
+
+        Assert.Equal(0, configured.GetProperty("temperature").GetDouble());
+        Assert.False(configured.GetProperty("parallel_tool_calls").GetBoolean());
+        Assert.False(configured.GetProperty("stream").GetBoolean());
+        Assert.Equal("medium", configured.GetProperty("reasoning_effort").GetString());
+        Assert.Equal("none", configured.GetProperty("tool_choice").GetString());
+    }
+
+    [Fact]
+    public void Completion_omits_absent_usage_but_serializes_supplied_usage()
+    {
+        var withoutUsage = JsonSerializer.SerializeToElement(new ChatCompletion
+        {
+            Id = "chatcmpl-example",
+            Created = 0,
+            Model = "gpt-4o-mini"
+        });
+        Assert.False(withoutUsage.TryGetProperty("usage", out _));
+
+        var withUsage = JsonSerializer.SerializeToElement(new ChatCompletion
+        {
+            Id = "chatcmpl-example",
+            Created = 0,
+            Model = "gpt-4o-mini",
+            Usage = new ChatCompletionUsage()
+        });
+        Assert.True(withUsage.TryGetProperty("usage", out _));
+    }
 }

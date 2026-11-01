@@ -141,7 +141,7 @@ tools/calls, audio, search, cache breakpoints, metadata, moderation, unknown
 variants and malformed union inputs. They are not claims of live endpoint/model
 support.
 
-The unchanged .NET 11 projects build with zero warnings/errors, and all 59 tests
+The .NET 11 projects build with zero warnings/errors, and all 61 tests
 pass using SDK `11.0.100-rc.3.26522.148`. The SDK was installed from official release
 metadata after the environment's preinstalled .NET 10 SDK could not target .NET 11.
 
@@ -149,6 +149,17 @@ metadata after the environment's preinstalled .NET 10 SDK could not target .NET 
 dotnet build AIHappey.ChatCompletions.csproj
 dotnet test tests/AIHappey.ChatCompletions.Tests/AIHappey.ChatCompletions.Tests.csproj
 ```
+
+## Second-round serialization hardening
+
+The current official OpenAPI schema confirms that request options such as
+`temperature`, `parallel_tool_calls`, `stream`, `reasoning_effort` and
+`tool_choice` are optional. When unset, these properties are now omitted rather
+than serialized as JSON `null`; explicitly supplied values, including `false`
+and `0`, retain their existing wire representation. Non-stream completion
+`usage` is likewise omitted when absent, matching its optional object schema.
+This only changes serialization of unset nullable properties and does not
+change public property types or deserialization.
 
 ## Remaining scope limits
 
