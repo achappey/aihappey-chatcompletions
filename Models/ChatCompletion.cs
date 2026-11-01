@@ -21,6 +21,7 @@ public class ChatCompletion
     public IEnumerable<ChatCompletionChoice> Choices { get; set; } = [];
 
     [JsonPropertyName("usage")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ChatCompletionUsage? Usage { get; set; }
 
     [JsonPropertyName("service_tier")]

@@ -11,6 +11,7 @@ public class ChatCompletionOptions
     public string Model { get; set; } = default!;
 
     [JsonPropertyName("temperature")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? Temperature { get; set; }
 
     [JsonPropertyName("top_p")]
@@ -78,12 +79,15 @@ public class ChatCompletionOptions
     public ChatCompletionPrediction? Prediction { get; set; }
 
     [JsonPropertyName("parallel_tool_calls")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? ParallelToolCalls { get; set; }
 
     [JsonPropertyName("stream")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? Stream { get; set; }
 
     [JsonPropertyName("reasoning_effort")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ChatCompletionReasoningEffort? ReasoningEffort { get; set; }
 
     [JsonPropertyName("messages")]
@@ -93,6 +97,7 @@ public class ChatCompletionOptions
     public IEnumerable<ChatCompletionToolDefinition> Tools { get; set; } = [];
 
     [JsonPropertyName("tool_choice")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ChatCompletionToolChoice? ToolChoiceOption
     {
         get => _toolChoiceOption;
