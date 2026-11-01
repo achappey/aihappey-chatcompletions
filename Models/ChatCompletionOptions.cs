@@ -31,7 +31,7 @@ public class ChatCompletionOptions
 
     [JsonPropertyName("stop")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public object? Stop { get; set; }
+    public ChatCompletionStop? Stop { get; set; }
 
     [JsonPropertyName("frequency_penalty")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -84,40 +84,33 @@ public class ChatCompletionOptions
     public bool? Stream { get; set; }
 
     [JsonPropertyName("reasoning_effort")]
-    public string? ReasoningEffort { get; set; }
+    public ChatCompletionReasoningEffort? ReasoningEffort { get; set; }
 
     [JsonPropertyName("messages")]
     public IEnumerable<ChatMessage> Messages { get; set; } = [];
 
     [JsonPropertyName("tools")]
-    public IEnumerable<object> Tools { get; set; } = [];
+    public IEnumerable<ChatCompletionToolDefinition> Tools { get; set; } = [];
 
     [JsonPropertyName("tool_choice")]
-    public object? ToolChoiceOption
+    public ChatCompletionToolChoice? ToolChoiceOption
     {
-        get => _toolChoiceOption ?? ToolChoice;
-        set
-        {
-            if (value is JsonElement { ValueKind: JsonValueKind.String } element)
-            {
-                ToolChoice = element.GetString();
-                _toolChoiceOption = null;
-            }
-            else
-            {
-                _toolChoiceOption = value;
-            }
-        }
+        get => _toolChoiceOption;
+        set => _toolChoiceOption = value;
     }
 
     [JsonIgnore]
-    public string? ToolChoice { get; set; }
+    public string? ToolChoice
+    {
+        get => (_toolChoiceOption as ChatCompletionToolChoiceMode)?.Mode;
+        set => _toolChoiceOption = value is null ? null : new ChatCompletionToolChoiceMode { Mode = value };
+    }
 
-    private object? _toolChoiceOption;
+    private ChatCompletionToolChoice? _toolChoiceOption;
 
     [JsonPropertyName("response_format")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public object? ResponseFormat { get; set; }
+    public ChatCompletionResponseFormat? ResponseFormat { get; set; }
 
     [JsonPropertyName("store")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -129,7 +122,43 @@ public class ChatCompletionOptions
 
     [JsonPropertyName("metadata")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public Dictionary<string, object?>? Metadata { get; set; }
+    public Dictionary<string, string>? Metadata { get; set; }
+
+    [JsonPropertyName("web_search_options")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ChatCompletionWebSearchOptions? WebSearchOptions { get; set; }
+
+    [JsonPropertyName("safety_identifier")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? SafetyIdentifier { get; set; }
+
+    [JsonPropertyName("prompt_cache_key")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? PromptCacheKey { get; set; }
+
+    [JsonPropertyName("prompt_cache_retention")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? PromptCacheRetention { get; set; }
+
+    [JsonPropertyName("prompt_cache_options")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ChatCompletionPromptCacheOptions? PromptCacheOptions { get; set; }
+
+    [JsonPropertyName("moderation")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ChatCompletionModerationOptions? Moderation { get; set; }
+
+    [JsonPropertyName("user")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? User { get; set; }
+
+    [JsonPropertyName("functions")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IEnumerable<ChatCompletionLegacyFunctionDefinition>? Functions { get; set; }
+
+    [JsonPropertyName("function_call")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ChatCompletionFunctionChoice? FunctionCall { get; set; }
 
     [JsonIgnore]
     public Dictionary<string, string>? Headers { get; set; }
@@ -152,7 +181,7 @@ public class ChatMessage
 
     [JsonPropertyName("content")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public JsonElement Content { get; set; }
+    public ChatMessageContent Content { get; set; }
 
     [JsonPropertyName("name")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -172,7 +201,7 @@ public class ChatMessage
 
     [JsonPropertyName("tool_calls")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IEnumerable<object>? ToolCalls { get; set; }
+    public IEnumerable<ChatCompletionToolCall>? ToolCalls { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
