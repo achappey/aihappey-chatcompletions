@@ -137,8 +137,8 @@ public class ChatCompletionJsonTests
         Assert.Equal("alloy", serialized.GetProperty("audio").GetProperty("voice").GetString());
 
         var roundtripped = JsonSerializer.Deserialize<ChatCompletionOptions>(serialized.GetRawText())!;
-        Assert.Equal("wav", roundtripped.Messages.Single().Content[2]
-            .GetProperty("input_audio").GetProperty("format").GetString());
+        Assert.Equal("wav", Assert.IsType<ChatMessageInputAudioPart>(
+            roundtripped.Messages.Single().Content.Parts![2]).InputAudio.Format);
     }
 
     [Fact]

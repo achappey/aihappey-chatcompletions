@@ -18,10 +18,10 @@ public class ChatCompletion
     public string Model { get; set; } = default!;
 
     [JsonPropertyName("choices")]
-    public IEnumerable<object> Choices { get; set; } = [];
+    public IEnumerable<ChatCompletionChoice> Choices { get; set; } = [];
 
     [JsonPropertyName("usage")]
-    public object? Usage { get; set; }
+    public ChatCompletionUsage? Usage { get; set; }
 
     [JsonPropertyName("service_tier")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -33,7 +33,11 @@ public class ChatCompletion
 
     [JsonPropertyName("metadata")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public Dictionary<string, object?>? Metadata { get; set; }
+    public Dictionary<string, string>? Metadata { get; set; }
+
+    [JsonPropertyName("moderation")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ChatCompletionModeration? Moderation { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
@@ -62,10 +66,14 @@ public class ChatCompletionUpdate
     public string? SystemFingerprint { get; set; }
 
     [JsonPropertyName("choices")]
-    public IEnumerable<object> Choices { get; set; } = [];
+    public IEnumerable<ChatCompletionStreamChoice> Choices { get; set; } = [];
 
     [JsonPropertyName("usage")]
-    public object? Usage { get; set; }
+    public ChatCompletionUsage? Usage { get; set; }
+
+    [JsonPropertyName("moderation")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ChatCompletionModeration? Moderation { get; set; }
 
     [JsonPropertyName("obfuscation")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

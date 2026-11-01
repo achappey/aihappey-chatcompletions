@@ -6,7 +6,7 @@ namespace AIHappey.ChatCompletions.Models;
 public class ChatCompletionAudioOptions
 {
     [JsonPropertyName("voice")]
-    public string Voice { get; set; } = default!;
+    public ChatCompletionVoice Voice { get; set; } = default!;
 
     [JsonPropertyName("format")]
     public string Format { get; set; } = default!;
@@ -21,7 +21,7 @@ public class ChatCompletionPrediction
     public string Type { get; set; } = "content";
 
     [JsonPropertyName("content")]
-    public object Content { get; set; } = default!;
+    public ChatMessageContent Content { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
@@ -36,7 +36,7 @@ public class ChatMessageAudio
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatMessageTextPart
+public class ChatMessageTextPart : ChatMessageContentPart
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "text";
@@ -44,17 +44,25 @@ public class ChatMessageTextPart
     [JsonPropertyName("text")]
     public string Text { get; set; } = default!;
 
+    [JsonPropertyName("prompt_cache_breakpoint")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ChatCompletionPromptCacheBreakpoint? PromptCacheBreakpoint { get; set; }
+
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatMessageImagePart
+public class ChatMessageImagePart : ChatMessageContentPart
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "image_url";
 
     [JsonPropertyName("image_url")]
     public ChatMessageImageUrl ImageUrl { get; set; } = new();
+
+    [JsonPropertyName("prompt_cache_breakpoint")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ChatCompletionPromptCacheBreakpoint? PromptCacheBreakpoint { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
@@ -73,13 +81,17 @@ public class ChatMessageImageUrl
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatMessageInputAudioPart
+public class ChatMessageInputAudioPart : ChatMessageContentPart
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "input_audio";
 
     [JsonPropertyName("input_audio")]
     public ChatMessageInputAudio InputAudio { get; set; } = new();
+
+    [JsonPropertyName("prompt_cache_breakpoint")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ChatCompletionPromptCacheBreakpoint? PromptCacheBreakpoint { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
@@ -97,13 +109,17 @@ public class ChatMessageInputAudio
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatMessageFilePart
+public class ChatMessageFilePart : ChatMessageContentPart
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "file";
 
     [JsonPropertyName("file")]
     public ChatMessageFile File { get; set; } = new();
+
+    [JsonPropertyName("prompt_cache_breakpoint")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ChatCompletionPromptCacheBreakpoint? PromptCacheBreakpoint { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
@@ -127,7 +143,7 @@ public class ChatMessageFile
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatCompletionTool
+public class ChatCompletionTool : ChatCompletionToolDefinition
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "function";
@@ -139,7 +155,7 @@ public class ChatCompletionTool
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatCompletionCustomTool
+public class ChatCompletionCustomTool : ChatCompletionToolDefinition
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "custom";
@@ -176,6 +192,9 @@ public class ChatCompletionCustomToolFormat
     [JsonPropertyName("grammar")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ChatCompletionCustomToolGrammar? Grammar { get; set; }
+
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
 public class ChatCompletionCustomToolGrammar
@@ -185,9 +204,12 @@ public class ChatCompletionCustomToolGrammar
 
     [JsonPropertyName("syntax")]
     public string Syntax { get; set; } = default!;
+
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatCompletionFunctionDefinition
+public class ChatCompletionLegacyFunctionDefinition
 {
     [JsonPropertyName("name")]
     public string Name { get; set; } = default!;
@@ -200,15 +222,18 @@ public class ChatCompletionFunctionDefinition
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public JsonElement? Parameters { get; set; }
 
-    [JsonPropertyName("strict")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public bool? Strict { get; set; }
-
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatCompletionNamedToolChoice
+public class ChatCompletionFunctionDefinition : ChatCompletionLegacyFunctionDefinition
+{
+    [JsonPropertyName("strict")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? Strict { get; set; }
+}
+
+public class ChatCompletionNamedToolChoice : ChatCompletionToolChoice
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "function";
@@ -220,7 +245,7 @@ public class ChatCompletionNamedToolChoice
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatCompletionNamedCustomToolChoice
+public class ChatCompletionNamedCustomToolChoice : ChatCompletionToolChoice
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "custom";
@@ -262,7 +287,7 @@ public class ChatCompletionFunctionCall
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatCompletionResponseFormatText
+public class ChatCompletionResponseFormatText : ChatCompletionResponseFormat
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "text";
@@ -271,7 +296,7 @@ public class ChatCompletionResponseFormatText
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatCompletionResponseFormatJsonObject
+public class ChatCompletionResponseFormatJsonObject : ChatCompletionResponseFormat
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "json_object";
@@ -280,7 +305,7 @@ public class ChatCompletionResponseFormatJsonObject
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatCompletionResponseFormatJsonSchema
+public class ChatCompletionResponseFormatJsonSchema : ChatCompletionResponseFormat
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "json_schema";
@@ -322,11 +347,10 @@ public class ChatCompletionChoice
     public ChatCompletionResponseMessage Message { get; set; } = new();
 
     [JsonPropertyName("finish_reason")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? FinishReason { get; set; }
+    public string FinishReason { get; set; } = default!;
 
     [JsonPropertyName("logprobs")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public ChatCompletionLogprobs? Logprobs { get; set; }
 
     [JsonExtensionData]
@@ -339,7 +363,7 @@ public class ChatCompletionResponseMessage
     public string Role { get; set; } = "assistant";
 
     [JsonPropertyName("content")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public string? Content { get; set; }
 
     [JsonPropertyName("refusal")]
@@ -348,7 +372,11 @@ public class ChatCompletionResponseMessage
 
     [JsonPropertyName("tool_calls")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IEnumerable<ChatCompletionMessageToolCall>? ToolCalls { get; set; }
+    public IEnumerable<ChatCompletionToolCall>? ToolCalls { get; set; }
+
+    [JsonPropertyName("audio")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ChatCompletionAudio? Audio { get; set; }
 
     [JsonPropertyName("function_call")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -356,13 +384,13 @@ public class ChatCompletionResponseMessage
 
     [JsonPropertyName("annotations")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IEnumerable<ChatCompletionAnnotation>? Annotations { get; set; }
+    public IEnumerable<ChatCompletionMessageAnnotation>? Annotations { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatCompletionMessageToolCall
+public class ChatCompletionMessageToolCall : ChatCompletionToolCall
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = default!;
@@ -377,7 +405,7 @@ public class ChatCompletionMessageToolCall
     public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 }
 
-public class ChatCompletionAnnotation
+public class ChatCompletionAnnotation : ChatCompletionMessageAnnotation
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "url_citation";
@@ -410,11 +438,11 @@ public class ChatCompletionUrlCitation
 public class ChatCompletionLogprobs
 {
     [JsonPropertyName("content")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public IEnumerable<ChatCompletionTokenLogprob>? Content { get; set; }
 
     [JsonPropertyName("refusal")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public IEnumerable<ChatCompletionTokenLogprob>? Refusal { get; set; }
 
     [JsonExtensionData]
@@ -430,7 +458,7 @@ public class ChatCompletionTokenLogprob
     public double Logprob { get; set; }
 
     [JsonPropertyName("bytes")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public IEnumerable<int>? Bytes { get; set; }
 
     [JsonPropertyName("top_logprobs")]
@@ -449,7 +477,7 @@ public class ChatCompletionTopLogprob
     public double Logprob { get; set; }
 
     [JsonPropertyName("bytes")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public IEnumerable<int>? Bytes { get; set; }
 
     [JsonExtensionData]
@@ -481,16 +509,24 @@ public class ChatCompletionUsage
 
 public class ChatCompletionPromptTokenDetails
 {
+    [JsonPropertyName("cache_write_tokens")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? CacheWriteTokens { get; set; }
+
     [JsonPropertyName("cached_tokens")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? CachedTokens { get; set; }
 
     [JsonPropertyName("audio_tokens")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? AudioTokens { get; set; }
 
     [JsonPropertyName("text_tokens")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? TextTokens { get; set; }
 
     [JsonPropertyName("image_tokens")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? ImageTokens { get; set; }
 
     [JsonExtensionData]
@@ -500,18 +536,23 @@ public class ChatCompletionPromptTokenDetails
 public class ChatCompletionCompletionTokenDetails
 {
     [JsonPropertyName("reasoning_tokens")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? ReasoningTokens { get; set; }
 
     [JsonPropertyName("audio_tokens")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? AudioTokens { get; set; }
 
     [JsonPropertyName("accepted_prediction_tokens")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? AcceptedPredictionTokens { get; set; }
 
     [JsonPropertyName("rejected_prediction_tokens")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? RejectedPredictionTokens { get; set; }
 
     [JsonPropertyName("text_tokens")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? TextTokens { get; set; }
 
     [JsonExtensionData]
