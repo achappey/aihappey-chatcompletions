@@ -318,4 +318,27 @@ public class ChatCompletionJsonTests
         });
         Assert.True(withUsage.TryGetProperty("usage", out _));
     }
+
+    [Fact]
+    public void Stream_update_serializes_null_usage_and_omits_absent_service_tier()
+    {
+        var withoutOptionalFields = JsonSerializer.SerializeToElement(
+            JsonSerializer.Deserialize<ChatCompletionUpdate>(
+                """{"id":"chatcmpl-example","object":"chat.completion.chunk","created":0,"model":"gpt-4o-mini","choices":[],"usage":null}""")!);
+
+        Assert.False(withoutOptionalFields.TryGetProperty("service_tier", out _));
+        Assert.Equal(JsonValueKind.Null, withoutOptionalFields.GetProperty("usage").ValueKind);
+
+        var withOptionalFields = JsonSerializer.SerializeToElement(new ChatCompletionUpdate
+        {
+            Id = "chatcmpl-example",
+            Created = 0,
+            Model = "gpt-4o-mini",
+            ServiceTier = "priority",
+            Usage = new ChatCompletionUsage { PromptTokens = 1 }
+        });
+
+        Assert.Equal("priority", withOptionalFields.GetProperty("service_tier").GetString());
+        Assert.Equal(1, withOptionalFields.GetProperty("usage").GetProperty("prompt_tokens").GetInt32());
+    }
 }
