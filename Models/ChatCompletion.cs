@@ -60,6 +60,7 @@ public class ChatCompletionUpdate
     public string Model { get; set; } = default!;
 
     [JsonPropertyName("service_tier")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? ServiceTier { get; set; }
 
     [JsonPropertyName("system_fingerprint")]
@@ -70,6 +71,7 @@ public class ChatCompletionUpdate
     public IEnumerable<ChatCompletionStreamChoice> Choices { get; set; } = [];
 
     [JsonPropertyName("usage")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ChatCompletionUsage? Usage { get; set; }
 
     [JsonPropertyName("moderation")]

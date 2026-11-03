@@ -161,6 +161,9 @@ and `0`, retain their existing wire representation. Non-stream completion
 This only changes serialization of unset nullable properties and does not
 change public property types or deserialization.
 
+Streamed response `service_tier` and `usage` follow the same omission behavior
+when absent; supplied values, including an empty usage object, are still emitted.
+
 ## Remaining scope limits
 
 - `ChatMessage` remains a shared role envelope supporting developer, system, user,
