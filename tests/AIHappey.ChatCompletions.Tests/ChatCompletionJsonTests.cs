@@ -320,17 +320,14 @@ public class ChatCompletionJsonTests
     }
 
     [Fact]
-    public void Stream_update_omits_absent_optional_fields_but_serializes_supplied_values()
+    public void Stream_update_serializes_null_usage_and_omits_absent_service_tier()
     {
-        var withoutOptionalFields = JsonSerializer.SerializeToElement(new ChatCompletionUpdate
-        {
-            Id = "chatcmpl-example",
-            Created = 0,
-            Model = "gpt-4o-mini"
-        });
+        var withoutOptionalFields = JsonSerializer.SerializeToElement(
+            JsonSerializer.Deserialize<ChatCompletionUpdate>(
+                """{"id":"chatcmpl-example","object":"chat.completion.chunk","created":0,"model":"gpt-4o-mini","choices":[],"usage":null}""")!);
 
         Assert.False(withoutOptionalFields.TryGetProperty("service_tier", out _));
-        Assert.False(withoutOptionalFields.TryGetProperty("usage", out _));
+        Assert.Equal(JsonValueKind.Null, withoutOptionalFields.GetProperty("usage").ValueKind);
 
         var withOptionalFields = JsonSerializer.SerializeToElement(new ChatCompletionUpdate
         {

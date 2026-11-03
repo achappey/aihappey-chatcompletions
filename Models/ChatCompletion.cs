@@ -71,7 +71,6 @@ public class ChatCompletionUpdate
     public IEnumerable<ChatCompletionStreamChoice> Choices { get; set; } = [];
 
     [JsonPropertyName("usage")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ChatCompletionUsage? Usage { get; set; }
 
     [JsonPropertyName("moderation")]
